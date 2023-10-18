@@ -2,7 +2,6 @@ package com.dio.gof.controller;
 
 import com.dio.gof.model.Cliente;
 import com.dio.gof.service.ClienteService;
-import com.dio.gof.service.impl.ClienteServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +20,7 @@ public class ClienteRestController {
 
     @GetMapping("{id}")
     Cliente buscaPorId(@PathVariable Long id){
-        return service.buscaPorId(id);
+        return service.buscarPorId(id);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -30,9 +29,9 @@ public class ClienteRestController {
         return service.inserir(cliente);
     }
 
-    @PutMapping
-    Cliente atualizar(@PathVariable Long id, @RequestBody Cliente cliente){
-        return service.atualizar(id,cliente);
+    @PutMapping("{id}")
+    void atualizar(@PathVariable Long id, @RequestBody Cliente cliente){
+        service.atualizar(id,cliente);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -40,5 +39,4 @@ public class ClienteRestController {
     void deletarCliente(Long id){
         service.deletar(id);
     }
-
 }

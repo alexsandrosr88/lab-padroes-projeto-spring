@@ -1,10 +1,8 @@
 package com.dio.gof.model;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
+@Entity
 public class Cliente {
 
     @Id
@@ -17,8 +15,7 @@ public class Cliente {
     public Cliente() {
     }
 
-    public Cliente(Long id, String nome, Endereco endereco) {
-        this.id = id;
+    public Cliente(String nome, Endereco endereco) {
         this.nome = nome;
         this.endereco = endereco;
     }

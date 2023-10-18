@@ -1,5 +1,6 @@
 package com.dio.gof.model;
 
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -10,11 +11,10 @@ Para isso, usamos o JSON de retorno da API do VIACEP.
 https://wwww.jsonschema2pojo.org
 https://viacep.com.br
  */
+@Entity
 public class Endereco {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     private String cep;
     private String logradouro;
     private String complemento;
