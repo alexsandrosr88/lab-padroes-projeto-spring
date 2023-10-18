@@ -1,5 +1,6 @@
 package com.dio.gof.service.impl;
 
+import com.dio.gof.dto.ClientePostDTO;
 import com.dio.gof.model.Cliente;
 import com.dio.gof.model.Endereco;
 import com.dio.gof.repository.ClienteRepository;
@@ -40,16 +41,16 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
-    public Cliente inserir(Cliente cliente) {
-        return salvarClienteComCep(cliente);
+    public Cliente inserir(ClientePostDTO clienteDTO) {
+        return salvarClienteComCep(clienteDTO);
     }
 
     @Override
-    public void atualizar(Long id, Cliente cliente) {
+    public void atualizar(Long id, ClientePostDTO clienteDTO) {
         // Buscar Cliente por ID, caso exista:
         Optional<Cliente> clienteBd = clienteRepository.findById(id);
         if (clienteBd.isPresent()) {
-            salvarClienteComCep(cliente);
+            salvarClienteComCep(clienteDTO);
         }
     }
 
@@ -59,17 +60,33 @@ public class ClienteServiceImpl implements ClienteService {
         clienteRepository.deleteById(id);
     }
 
-    private Cliente salvarClienteComCep(Cliente cliente) {
-        // Verificar se o Endereco do Cliente já existe (pelo CEP).
-        String cep = cliente.getEndereco().getCep();
-        Endereco endereco = enderecoRepository.findById(cep).orElseGet(() -> {
-            // Caso não exista, integrar com o ViaCEP e persistir o retorno.
-            Endereco novoEndereco = viaCepService.consultarCep(cep);
-            enderecoRepository.save(novoEndereco);
-            return novoEndereco;
+//    private Cliente salvarClienteComCep(Cliente cliente) {
+//        // Verificar se o Endereco do Cliente já existe (pelo CEP).
+//        String cep = cliente.getEndereco().getCep();
+//        Endereco endereco = enderecoRepository.findById(cep).orElseGet(() -> {
+//            // Caso não exista, integrar com o ViaCEP e persistir o retorno.
+//            Endereco novoEndereco = viaCepService.consultarCep(cep);
+//            enderecoRepository.save(novoEndereco);
+//            return novoEndereco;
+//        });
+//        cliente.setEndereco(endereco);
+//        // Inserir Cliente, vinculando o Endereco (novo ou existente).
+//       return clienteRepository.save(cliente);
+//    }
+
+    private Cliente salvarClienteComCep(ClientePostDTO clienteDTO){
+        Endereco end = enderecoRepository.findById(clienteDTO.getCep()).orElseGet(()->{
+            Endereco endNovo = viaCepService.consultarCep(clienteDTO.getCep());
+            endNovo.setNumero(clienteDTO.getNumero());
+            endNovo.setComplemento(clienteDTO.getComplemento());
+            return enderecoRepository.save(endNovo);
         });
-        cliente.setEndereco(endereco);
-        // Inserir Cliente, vinculando o Endereco (novo ou existente).
-       return clienteRepository.save(cliente);
+        Cliente novoCliente = new Cliente();
+        novoCliente.setNome(clienteDTO.getNome());
+        end.setNumero(clienteDTO.getNumero());
+        end.setComplemento(clienteDTO.getComplemento());
+        novoCliente.setEndereco(end);
+        return clienteRepository.save(novoCliente);
     }
+
 }

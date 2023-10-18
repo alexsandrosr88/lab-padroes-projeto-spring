@@ -1,7 +1,10 @@
 package com.dio.gof.model;
 
+import lombok.Data;
+
 import javax.persistence.*;
 
+@Data
 @Entity
 public class Cliente {
 
@@ -12,35 +15,4 @@ public class Cliente {
     @ManyToOne
     private Endereco endereco;
 
-    public Cliente() {
-    }
-
-    public Cliente(String nome, Endereco endereco) {
-        this.nome = nome;
-        this.endereco = endereco;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public Endereco getEndereco() {
-        return endereco;
-    }
-
-    public void setEndereco(Endereco endereco) {
-        this.endereco = endereco;
-    }
 }

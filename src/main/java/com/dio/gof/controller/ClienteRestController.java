@@ -1,5 +1,6 @@
 package com.dio.gof.controller;
 
+import com.dio.gof.dto.ClientePostDTO;
 import com.dio.gof.model.Cliente;
 import com.dio.gof.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +26,13 @@ public class ClienteRestController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    Cliente inserir(@RequestBody Cliente cliente){
-        return service.inserir(cliente);
+    Cliente inserir(@RequestBody ClientePostDTO clienteDTO){
+        return service.inserir(clienteDTO);
     }
 
     @PutMapping("{id}")
-    void atualizar(@PathVariable Long id, @RequestBody Cliente cliente){
-        service.atualizar(id,cliente);
+    void atualizar(Long id, @RequestBody ClientePostDTO clienteDTO){
+        service.atualizar(id,clienteDTO);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
