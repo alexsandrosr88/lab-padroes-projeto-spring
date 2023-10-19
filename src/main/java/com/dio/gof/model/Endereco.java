@@ -1,6 +1,9 @@
 package com.dio.gof.model;
 
+import com.dio.gof.dto.EnderecoViaCepDTO;
 import lombok.Data;
+import lombok.Generated;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,20 +17,28 @@ https://wwww.jsonschema2pojo.org
 https://viacep.com.br
  */
 @Data
+@NoArgsConstructor
 @Entity
 public class Endereco {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     private String cep;
     private String logradouro;
     private Integer numero;
     private String complemento;
     private String bairro;
-    private String localidade;
+    private String cidade;
     private String uf;
-    private String ibge;
-    private String gia;
-    private String ddd;
-    private String siafi;
+
+
+    public Endereco(EnderecoViaCepDTO enderecoViaCepDTO){
+        cep = enderecoViaCepDTO.getCep();
+        logradouro = enderecoViaCepDTO.getLogradouro();
+        bairro = enderecoViaCepDTO.getBairro();
+        cidade = enderecoViaCepDTO.getLocalidade();
+        uf = enderecoViaCepDTO.getUf();
+    }
 
 }

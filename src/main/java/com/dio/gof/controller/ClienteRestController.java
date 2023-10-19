@@ -27,7 +27,7 @@ public class ClienteRestController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     Cliente inserir(@RequestBody ClientePostDTO clienteDTO){
-        return service.inserir(clienteDTO);
+        return service.salvarCliente(clienteDTO);
     }
 
     @PutMapping("{id}")

@@ -6,7 +6,7 @@ import com.dio.gof.model.Cliente;
 public interface ClienteService {
     Iterable<Cliente> buscarTodos();
     Cliente buscarPorId(Long id);
-    Cliente inserir (ClientePostDTO clienteDTO);
+    Cliente salvarCliente (ClientePostDTO clienteDTO);
     void atualizar (Long id, ClientePostDTO ClienteDTO);
     void deletar(Long id);
 

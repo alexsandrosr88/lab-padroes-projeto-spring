@@ -1,10 +1,12 @@
 package com.dio.gof.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Data
+@NoArgsConstructor
 @Entity
 public class Cliente {
 
@@ -15,4 +17,8 @@ public class Cliente {
     @ManyToOne
     private Endereco endereco;
 
+    public Cliente(String nome, Endereco endereco) {
+        this.nome = nome;
+        this.endereco = endereco;
+    }
 }

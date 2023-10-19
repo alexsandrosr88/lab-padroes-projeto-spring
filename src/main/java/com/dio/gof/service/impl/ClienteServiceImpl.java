@@ -41,7 +41,7 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
-    public Cliente inserir(ClientePostDTO clienteDTO) {
+    public Cliente salvarCliente(ClientePostDTO clienteDTO) {
         return salvarClienteComCep(clienteDTO);
     }
 
@@ -60,33 +60,30 @@ public class ClienteServiceImpl implements ClienteService {
         clienteRepository.deleteById(id);
     }
 
-//    private Cliente salvarClienteComCep(Cliente cliente) {
-//        // Verificar se o Endereco do Cliente já existe (pelo CEP).
-//        String cep = cliente.getEndereco().getCep();
-//        Endereco endereco = enderecoRepository.findById(cep).orElseGet(() -> {
-//            // Caso não exista, integrar com o ViaCEP e persistir o retorno.
-//            Endereco novoEndereco = viaCepService.consultarCep(cep);
-//            enderecoRepository.save(novoEndereco);
-//            return novoEndereco;
-//        });
-//        cliente.setEndereco(endereco);
-//        // Inserir Cliente, vinculando o Endereco (novo ou existente).
-//       return clienteRepository.save(cliente);
-//    }
-
-    private Cliente salvarClienteComCep(ClientePostDTO clienteDTO){
-        Endereco end = enderecoRepository.findById(clienteDTO.getCep()).orElseGet(()->{
-            Endereco endNovo = viaCepService.consultarCep(clienteDTO.getCep());
-            endNovo.setNumero(clienteDTO.getNumero());
-            endNovo.setComplemento(clienteDTO.getComplemento());
-            return enderecoRepository.save(endNovo);
-        });
-        Cliente novoCliente = new Cliente();
-        novoCliente.setNome(clienteDTO.getNome());
-        end.setNumero(clienteDTO.getNumero());
-        end.setComplemento(clienteDTO.getComplemento());
-        novoCliente.setEndereco(end);
-        return clienteRepository.save(novoCliente);
+    private Cliente salvarClienteComCep(ClientePostDTO clienteDTO) {
+        Endereco end = existsEndereco(clienteDTO).orElseGet(() -> salvarEndereco(clienteDTO));
+        return clienteRepository.save(new Cliente(clienteDTO.getNome(), end));
     }
 
+    private Optional<Endereco> existsEndereco(ClientePostDTO clientePostDTO) {
+        validaCEP(clientePostDTO);
+        return Optional.ofNullable(enderecoRepository.existsEndereco(clientePostDTO.getCep(),
+                clientePostDTO.getNumero(),
+                clientePostDTO.getComplemento()));
+    }
+
+    private Endereco salvarEndereco(ClientePostDTO clientePostDTO) {
+        Endereco endEntity = new Endereco(viaCepService.consultarCep(clientePostDTO.getCep()));
+        endEntity.setNumero(clientePostDTO.getNumero());
+        endEntity.setComplemento(clientePostDTO.getComplemento());
+
+        return enderecoRepository.save(endEntity);
+    }
+
+    private void validaCEP(ClientePostDTO clientePostDTO){
+        if(!clientePostDTO.getCep().substring(5,6).equalsIgnoreCase("-")){
+            String cep = clientePostDTO.getCep();
+            clientePostDTO.setCep(cep.substring(0,5).concat("-").concat(cep.substring(5,8)));
+        }
+    }
 }
