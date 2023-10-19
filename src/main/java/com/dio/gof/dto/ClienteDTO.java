@@ -3,7 +3,7 @@ package com.dio.gof.dto;
 import lombok.Data;
 
 @Data
-public class ClientePostDTO {
+public class ClienteDTO {
     private String nome;
     private String cep;
     private Integer numero;

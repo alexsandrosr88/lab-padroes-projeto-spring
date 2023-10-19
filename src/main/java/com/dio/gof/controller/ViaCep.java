@@ -17,6 +17,6 @@ class ViaCep {
 
     @GetMapping("{cep}")
     public EnderecoViaCepDTO pesquisarCep(@PathVariable String cep){
-        return service.consultarCep(cep);
+        return service.consultarCep(cep).orElseThrow();
     }
 }

@@ -14,10 +14,16 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     private Endereco endereco;
 
     public Cliente(String nome, Endereco endereco) {
+        this.nome = nome;
+        this.endereco = endereco;
+    }
+
+    public Cliente(Long id, String nome, Endereco endereco) {
+        this.id = id;
         this.nome = nome;
         this.endereco = endereco;
     }
