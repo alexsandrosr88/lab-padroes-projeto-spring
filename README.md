@@ -28,6 +28,10 @@ Eu reaproveitei o projeto modelo e fiz melhorias como:
 - H2
 - Consumo da API [ViaCep](https://viacep.com.br/)
 
+# URL para teste
+
+http://localhost:8080/swagger-ui/index.html
+
 # Provedora do Curso
 
 [DIO](https://www.dio.me/)
