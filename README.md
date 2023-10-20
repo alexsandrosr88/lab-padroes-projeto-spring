@@ -31,6 +31,4 @@ Eu reaproveitei o projeto modelo e fiz melhorias como:
 # Provedora do Curso
 
 [DIO](https://www.dio.me/)
-## 🚀 Sobre mim
-Eu sou uma pessoa desenvolvedora full-stack...
 
