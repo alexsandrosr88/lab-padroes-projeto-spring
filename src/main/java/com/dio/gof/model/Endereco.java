@@ -40,5 +40,4 @@ public class Endereco {
         cidade = enderecoViaCepDTO.getLocalidade();
         uf = enderecoViaCepDTO.getUf();
     }
-
 }

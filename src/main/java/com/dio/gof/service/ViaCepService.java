@@ -17,5 +17,5 @@ https://viacep.com.br
 public interface ViaCepService {
 
     @GetMapping("/{cep}/json/")
-    Optional<EnderecoViaCepDTO> consultarCep(@PathVariable("cep") String cep) throws RecursoNaoEncontrado;
+    EnderecoViaCepDTO consultarCep(@PathVariable("cep") String cep);
 }

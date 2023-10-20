@@ -14,7 +14,7 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne
     private Endereco endereco;
 
     public Cliente(String nome, Endereco endereco) {

@@ -1,13 +1,15 @@
 package com.dio.gof.service;
 
-import com.dio.gof.dto.ClienteDTO;
-import com.dio.gof.model.Cliente;
+import com.dio.gof.dto.ClienteRequestDTO;
+import com.dio.gof.dto.ClienteResponseDTO;
+
+import java.util.List;
 
 public interface ClienteService {
-    Iterable<Cliente> buscarTodos();
-    Cliente buscarPorId(Long id);
-    Cliente salvarCliente (ClienteDTO clienteDTO);
-    Cliente atualizarCliente (Long id, ClienteDTO ClienteDTO);
-    void deletar(Long id);
+    List<ClienteResponseDTO> buscarTodos();
+    ClienteResponseDTO buscarPorId(Long id);
+    ClienteResponseDTO salvarClienteComEndereco(ClienteRequestDTO clienteRequestDTO);
+    ClienteResponseDTO atualizarClienteComEndereco(Long id, ClienteRequestDTO ClienteRequestDTO);
+    void deletarCliente(Long id);
 
 }

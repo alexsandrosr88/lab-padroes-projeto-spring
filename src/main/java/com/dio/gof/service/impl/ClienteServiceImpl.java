@@ -1,6 +1,7 @@
 package com.dio.gof.service.impl;
 
-import com.dio.gof.dto.ClienteDTO;
+import com.dio.gof.dto.ClienteRequestDTO;
+import com.dio.gof.dto.ClienteResponseDTO;
 import com.dio.gof.model.Cliente;
 import com.dio.gof.model.Endereco;
 import com.dio.gof.repository.ClienteRepository;
@@ -11,8 +12,11 @@ import com.dio.gof.service.Exception.RecursoNaoEncontrado;
 import com.dio.gof.service.ViaCepService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ClienteServiceImpl implements ClienteService {
@@ -30,77 +34,77 @@ public class ClienteServiceImpl implements ClienteService {
     // Facade: Abstrair integrações com subsistemas, provendo uma interface simples.
 
     @Override
-    public Iterable<Cliente> buscarTodos() {
-        return clienteRepository.findAll();
+    public List<ClienteResponseDTO> buscarTodos() {
+        return clienteRepository.findAll().stream().map(ClienteResponseDTO::new).collect(Collectors.toList());
     }
 
     @Override
-    public Cliente buscarPorId(Long id) {
+    public ClienteResponseDTO buscarPorId(Long id) {
         validaClienteID(id);
-        return clienteRepository.findById(id).get();
+        return new ClienteResponseDTO(clienteRepository.findById(id).get());
     }
 
+    @Transactional(readOnly = false)
     @Override
-    public Cliente salvarCliente(ClienteDTO clienteDTO) {
-        return salvarClienteComCep(clienteDTO);
-    }
-    @Override
-    public Cliente atualizarCliente(Long id, ClienteDTO clienteDTO) {
+    public ClienteResponseDTO salvarClienteComEndereco(ClienteRequestDTO clienteRequestDTO) {
+        validaCamposObrigatorios(clienteRequestDTO);
+        Endereco end = existsEndereco(clienteRequestDTO).orElseGet(() -> salvarEndereco(clienteRequestDTO));
 
-        validaCamposObrigatorios(clienteDTO);
+        return new ClienteResponseDTO(clienteRepository.save(new Cliente(clienteRequestDTO.getNome(), end)));
+    }
+
+    @Transactional(readOnly = false)
+    @Override
+    public ClienteResponseDTO atualizarClienteComEndereco(Long id, ClienteRequestDTO clienteRequestDTO) {
+
+        validaCamposObrigatorios(clienteRequestDTO);
 
         Cliente atualizaCliente = validaClienteID(id);
-        atualizaCliente.setNome(clienteDTO.getNome());
+        atualizaCliente.setNome(clienteRequestDTO.getNome());
 
-        atualizaCliente.getEndereco().setCep(clienteDTO.getCep());
-        atualizaCliente.getEndereco().setNumero(clienteDTO.getNumero());
-        atualizaCliente.getEndereco().setComplemento(clienteDTO.getComplemento());
+        Endereco end = existsEndereco(clienteRequestDTO).orElseGet(() -> salvarEndereco(clienteRequestDTO));
 
+        atualizaCliente.setEndereco(end);
 
-        return clienteRepository.save(atualizaCliente);
+        return new ClienteResponseDTO(clienteRepository.save(atualizaCliente));
     }
 
+    @Transactional(readOnly = false)
     @Override
-    public void deletar(Long id) {
+    public void deletarCliente(Long id) {
         clienteRepository.delete(validaClienteID(id));
     }
 
-    private Cliente salvarClienteComCep(ClienteDTO clienteDTO) {
-        validaCamposObrigatorios(clienteDTO);
-        Endereco end = existsEndereco(clienteDTO).orElseGet(() -> salvarEndereco(clienteDTO));
-        return clienteRepository.save(new Cliente(clienteDTO.getNome(), end));
+    private Optional<Endereco> existsEndereco(ClienteRequestDTO clienteRequestDTO) {
+        validaCEP(clienteRequestDTO);
+        return Optional.ofNullable(enderecoRepository.existsEndereco(clienteRequestDTO.getCep(),
+                clienteRequestDTO.getNumero(),
+                clienteRequestDTO.getComplemento()));
     }
 
-    private Optional<Endereco> existsEndereco(ClienteDTO clienteDTO) {
-        validaCEP(clienteDTO);
-        return Optional.ofNullable(enderecoRepository.existsEndereco(clienteDTO.getCep(),
-                clienteDTO.getNumero(),
-                clienteDTO.getComplemento()));
-    }
-
-    private Endereco salvarEndereco(ClienteDTO clienteDTO) {
-        Endereco endEntity = new Endereco(viaCepService.consultarCep(clienteDTO.getCep()).orElseThrow(RecursoNaoEncontrado::new));
-        endEntity.setNumero(clienteDTO.getNumero());
-        endEntity.setComplemento(clienteDTO.getComplemento());
+    private Endereco salvarEndereco(ClienteRequestDTO clienteRequestDTO) {
+        Endereco endEntity = new Endereco(viaCepService.consultarCep(clienteRequestDTO.getCep()));
+        endEntity.setNumero(clienteRequestDTO.getNumero());
+        endEntity.setComplemento(clienteRequestDTO.getComplemento());
 
         return enderecoRepository.save(endEntity);
     }
 
-    private void validaCEP(ClienteDTO clienteDTO) {
-        if (!clienteDTO.getCep().substring(5, 6).equalsIgnoreCase("-")) {
-            String cep = clienteDTO.getCep();
-            clienteDTO.setCep(cep.substring(0, 5).concat("-").concat(cep.substring(5, 8)));
+    private void validaCEP(ClienteRequestDTO clienteRequestDTO) {
+        if (!clienteRequestDTO.getCep().substring(5, 6).equalsIgnoreCase("-")) {
+            String cep = clienteRequestDTO.getCep();
+            clienteRequestDTO.setCep(cep.substring(0, 5).concat("-").concat(cep.substring(5, 8)));
         }
     }
 
-    private void validaCamposObrigatorios(ClienteDTO clienteDTO) {
-        if (clienteDTO.getCep() == null)
+    private void validaCamposObrigatorios(ClienteRequestDTO clienteRequestDTO) {
+        if (clienteRequestDTO.getCep() == null || clienteRequestDTO.getCep().equalsIgnoreCase("string"))
             throw new CampoObrigatorioException("CEP");
-        else if (clienteDTO.getNome() == null)
+        else if (clienteRequestDTO.getNome() == null)
             throw new CampoObrigatorioException("Nome");
-        else if (clienteDTO.getNumero() == null)
+        else if (clienteRequestDTO.getNumero() == null)
             throw new CampoObrigatorioException("Número");
-        else if (clienteDTO.getComplemento() == null)
+        else if (clienteRequestDTO.getComplemento() == null)
             throw new CampoObrigatorioException("Complemento");
     }
 
